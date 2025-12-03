@@ -1,3 +1,7 @@
+# url-fetcher
+
+URL fetcher built with NestJS
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
@@ -72,7 +76,7 @@ With Mau, you can deploy your application in just a few clicks, allowing you to 
 
 ## Resources
 
-Check out a few resources that may come in handy when working with NestJS:
+Check out a few resources that may be handy when working with NestJS:
 
 - Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
 - For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
