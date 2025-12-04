@@ -42,6 +42,11 @@ export class RequestComtroller {
                 error: `Request not found: ${id}`,
             }
         }
-        return record;
+        return {
+            id: record.id,
+            createdAt: record.createdAt,
+            urls: record.urls,
+            results: [],
+        };
     }
 }
