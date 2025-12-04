@@ -1,26 +1,41 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { UrlFetchResult } from "./models/request-result.model";
 import axios from "axios";
+import { HTTP_TIMEOUT_MS, MAX_CONTENT_LENGTH_BYTES, MAX_REDIRECTS } from "src/common/constants";
 
 @Injectable()
 export class UrlFetcherService {
     private readonly logger = new Logger(UrlFetcherService.name);
-    
-    constructor() {}
+
+    constructor() { }
 
     async fetchOne(url: string): Promise<UrlFetchResult> {
         try {
             const response = await axios.get(url, {
+                timeout: HTTP_TIMEOUT_MS,
+                maxRedirects: MAX_REDIRECTS, //definiton
+                responseType: 'arraybuffer',
+                maxContentLength: MAX_CONTENT_LENGTH_BYTES,
                 validateStatus: () => true,
             });
+            //fallback to original url if final url is not set
+            const finalUrl = (response.request && response.request.res && response.request.res.responseUrl)
+                ? response.request.res.responseUrl
+                : url;
             const contentType = response.headers['content-type'] ?? null;
-            const data = response.data;
 
-            const content = typeof data === 'string' ? data : JSON.stringify(data);
+            let content: string | null = null;
+            try {
+                const buffer = response.data as Buffer;
+                content = buffer.toString('utf-8');
+            } catch (error) {
+                this.logger.error(`Error parsing content for URL: ${url}`, error);
+                content = null;
+            }
 
             return {
                 url,
-                finalUrl: url, //todo: add final url
+                finalUrl,
                 statusCode: response.status ?? null,
                 contentType,
                 content,
