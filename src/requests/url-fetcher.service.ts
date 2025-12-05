@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { UrlFetchResult } from "./models/request-result.model";
 import axios from "axios";
 import { HTTP_TIMEOUT_MS, MAX_CONTENT_LENGTH_BYTES, MAX_REDIRECTS } from "src/common/constants";
+import { ensurePublicHttpUrl } from "src/common/ssrf.util";
 
 @Injectable()
 export class UrlFetcherService {
@@ -11,6 +12,8 @@ export class UrlFetcherService {
 
     async fetchOne(url: string): Promise<UrlFetchResult> {
         try {
+            //check if url is a public http url
+            await ensurePublicHttpUrl(url);
             const response = await axios.get(url, {
                 timeout: HTTP_TIMEOUT_MS,
                 maxRedirects: MAX_REDIRECTS, //definiton
