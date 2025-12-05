@@ -24,6 +24,17 @@
             "skipFiles": ["<node_internals>/**"],
             "restart": true,
             "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Tests",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "test:debug"],
+            "skipFiles": ["<node_internals>/**"],
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
