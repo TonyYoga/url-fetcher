@@ -7,7 +7,7 @@ export class RequestsController {
     constructor(private readonly requestsService: RequestsService) {}
 
     @Post('create')
-    createRequest(@Body() createRequestDto: CreateRequestDto) {
+    async createRequest(@Body() createRequestDto: CreateRequestDto) {
 
         const { urls } = createRequestDto;
         return this.requestsService.create(urls);
