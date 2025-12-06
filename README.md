@@ -28,6 +28,26 @@ http://internal-service:8080/api    # Access internal microservices
 - **Port scanning** — enumerate internal infrastructure
 - **Data exfiltration** — steal sensitive information
 
+## Protection
+
+This service implements **multi-layer SSRF protection**:
+
+| Layer | Description |
+|-------|-------------|
+| 🛡️ **IP Blocking** | Blocks private, loopback, link-local, cloud metadata ranges |
+| 🔄 **Redirect Validation** | Validates every URL in redirect chains |
+| 🌐 **DNS Check** | Resolves hostnames before IP validation |
+| ⚙️ **Configurable Rules** | Centralized security configuration |
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Architecture](./docs/ARCHITECTURE.md) | System design, components, data flow |
+| [Security](./docs/SECURITY.md) | SSRF protection, extension guide, best practices |
+
+> 📚 See full documentation in [`docs/`](./docs/) for diagrams, API reference, and how to extend security rules.
+
 ## API
 
 ### Fetch URLs
