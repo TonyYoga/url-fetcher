@@ -9,6 +9,7 @@
 | [README](../README.md) | Project overview and quick start |
 | [Architecture](./ARCHITECTURE.md) | System architecture and component relationships |
 | [Security](./SECURITY.md) | SSRF protection module documentation |
+| [Logging](./LOGGING.md) | Structured logging and observability |
 
 ---
 
@@ -26,6 +27,12 @@
 - **Data Flow Diagrams** → [Security - Data Flow](./SECURITY.md#data-flow)
 - **Extension Guide** → [Security - Extension Guide](./SECURITY.md#extension-guide)
 
+### For DevOps / SRE
+
+- **Logging System** → [Logging](./LOGGING.md)
+- **Log Events Reference** → [Logging - Events](./LOGGING.md#events-reference)
+- **Request Tracing** → [Logging - Request Context](./LOGGING.md#request-context)
+
 ---
 
 ## Project Overview
@@ -35,10 +42,11 @@ url-fetcher/
 ├── docs/                    # 📚 Documentation
 │   ├── INDEX.md            # This file
 │   ├── ARCHITECTURE.md     # System architecture
-│   └── SECURITY.md         # Security module docs
+│   ├── SECURITY.md         # Security module docs
+│   └── LOGGING.md          # Logging & observability
 │
 ├── src/
-│   ├── common/             # 🔧 Shared utilities
+│   ├── common/             # 🔧 Shared utilities, logging, middleware
 │   ├── requests/           # 📨 Request handling
 │   └── security/           # 🛡️ SSRF protection
 │

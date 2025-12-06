@@ -45,6 +45,7 @@ This service implements **multi-layer SSRF protection**:
 |----------|-------------|
 | [Architecture](./docs/ARCHITECTURE.md) | System design, components, data flow |
 | [Security](./docs/SECURITY.md) | SSRF protection, extension guide, best practices |
+| [Logging](./docs/LOGGING.md) | Structured JSON logging, request tracing |
 
 > 📚 See full documentation in [`docs/`](./docs/) for diagrams, API reference, and how to extend security rules.
 

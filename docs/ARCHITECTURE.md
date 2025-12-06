@@ -17,7 +17,13 @@ graph TB
             C[AppModule]
             D[RequestsModule]
             E[SecurityModule]
+            E2[LoggerModule]
         end
+    end
+
+    subgraph "Middleware & Interceptors"
+        MW[RequestContextMiddleware]
+        LI[LoggingInterceptor]
     end
 
     subgraph "Domain Layer"
@@ -37,12 +43,16 @@ graph TB
         M[In-Memory Store]
         N[Axios HTTP Client]
         O[DNS Resolver]
+        P[AppLogger]
     end
 
-    A -->|HTTP| B
+    A -->|HTTP| MW
+    MW --> LI
+    LI --> B
     B --> C
     C --> D
     C -.-> E
+    C -.-> E2
     
     D --> F
     F --> G
@@ -57,11 +67,19 @@ graph TB
     G --> M
     K --> N
     J --> O
+    
+    G -.-> P
+    H -.-> P
+    J -.-> P
+    I -.-> P
 
     style E fill:#ff6b6b,color:#fff
     style I fill:#ff6b6b,color:#fff
     style J fill:#4ecdc4,color:#fff
     style K fill:#45b7d1,color:#fff
+    style P fill:#9b59b6,color:#fff
+    style MW fill:#f39c12,color:#fff
+    style LI fill:#f39c12,color:#fff
 ```
 
 ## Module Structure
@@ -74,8 +92,19 @@ src/
 ├── common/                 # Shared utilities
 │   ├── constants.ts        # Application constants
 │   ├── normalize-ip.utils.ts  # IP normalization utilities
-│   ├── ssrf.util.ts        # Legacy SSRF utilities
-│   └── ssrf.util.spec.ts   # Unit tests
+│   │
+│   ├── context/            # Request context (AsyncLocalStorage)
+│   │   └── request-context.ts
+│   │
+│   ├── interceptors/       # NestJS interceptors
+│   │   └── logging.interceptor.ts
+│   │
+│   ├── logger/             # Logging infrastructure
+│   │   ├── app-logger.service.ts
+│   │   └── logger.module.ts
+│   │
+│   └── middleware/         # HTTP middleware
+│       └── request-context.middleware.ts
 │
 ├── requests/               # Requests feature module
 │   ├── requests.module.ts
@@ -106,6 +135,8 @@ src/
 ```mermaid
 sequenceDiagram
     participant C as Client
+    participant MW as RequestContextMiddleware
+    participant LI as LoggingInterceptor
     participant VP as ValidationPipe
     participant G as SsrfGuard
     participant RC as RequestsController
@@ -114,7 +145,11 @@ sequenceDiagram
     participant SH as SecureHttpClient
     participant EXT as External URL
 
-    C->>VP: POST /requests/create
+    C->>MW: POST /requests/create
+    Note over MW: Create RequestContext<br/>(requestId, startTime)
+    MW->>LI: next()
+    Note over LI: Log request_start
+    LI->>VP: next()
     Note over VP: Validate DTO<br/>(urls: string[])
     VP->>G: canActivate()
     Note over G: Validate all URLs<br/>against SSRF policy
@@ -132,7 +167,9 @@ sequenceDiagram
     
     UF-->>RS: UrlFetchResult[]
     RS-->>RC: { id, createdAt, count }
-    RC-->>C: 201 Created
+    RC-->>LI: Response
+    Note over LI: Log request_complete
+    LI-->>C: 201 Created
 ```
 
 ## Component Responsibilities
@@ -341,14 +378,25 @@ flowchart TD
 
 ### Unit Tests
 
-- `ssrf.util.spec.ts` - IP validation functions
-- Mock DNS resolution for deterministic testing
-- Test all private IP ranges
+| Test File | Coverage |
+|-----------|----------|
+| `normalize-ip.utils.spec.ts` | IPv4/IPv6 normalization, CIDR matching |
+| `ssrf-policy.service.spec.ts` | SSRF policy validation, DNS mocking |
+| `ssrf.guard.spec.ts` | Guard input validation, URL blocking |
+| `security-axios.adapter.spec.ts` | Redirect handling, DNS rebinding |
+| `requests.service.spec.ts` | Request creation, storage, retrieval |
 
 ### E2E Tests
 
-- `app.e2e-spec.ts` - API endpoint testing
+- `app.e2e-spec.ts` - Full API endpoint testing
+- Tests SSRF blocking at HTTP level
 - Supertest for HTTP assertions
+
+### Test Approach
+
+- **Mock only external dependencies** (DNS, HTTP)
+- **Use real services** for integration tests
+- **Test security edge cases** (octal IPs, redirect chains, DNS rebinding)
 
 ### Running Tests
 
