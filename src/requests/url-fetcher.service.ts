@@ -3,18 +3,18 @@ import { UrlFetchResult } from "./models/request-result.model";
 import axios from "axios";
 import { HTTP_TIMEOUT_MS, MAX_CONTENT_LENGTH_BYTES, MAX_REDIRECTS } from "src/common/constants";
 import { ensurePublicHttpUrl } from "src/common/ssrf.util";
+import { SecureHttpClient } from "src/security/http/secure-http.clents";
 
 @Injectable()
 export class UrlFetcherService {
     private readonly logger = new Logger(UrlFetcherService.name);
 
-    constructor() { }
+    constructor(private readonly secureHttpClient: SecureHttpClient) { }
 
     async fetchOne(url: string): Promise<UrlFetchResult> {
         try {
             //check if url is a public http url
-            await ensurePublicHttpUrl(url);
-            const response = await axios.get(url, {
+            const response = await this.secureHttpClient.get(url, {
                 timeout: HTTP_TIMEOUT_MS,
                 maxRedirects: MAX_REDIRECTS, //definiton
                 responseType: 'arraybuffer',
