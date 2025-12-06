@@ -1,8 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { UrlFetchResult } from "./models/request-result.model";
-import axios from "axios";
 import { HTTP_TIMEOUT_MS, MAX_CONTENT_LENGTH_BYTES, MAX_REDIRECTS } from "src/common/constants";
-import { ensurePublicHttpUrl } from "src/common/ssrf.util";
 import { SecureHttpClient } from "src/security/http/secure-http.clents";
 
 @Injectable()
